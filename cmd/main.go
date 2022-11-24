@@ -1,24 +1,12 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
-func main() { // 1: main routing starts
+// Demonstrating a constraint of channel - Blocking operation
+func main() {
 	c := make(chan string)
-	go count("sheep", c) // 2: second go routine starts which runs the count function
+	c <- "hello" // 1: Here, we send a value through the channel, c, which blocks the next operation.
 
-	for msg := range c { // 4: exists the loop once c range satisfied
-		fmt.Println(msg)
-	}
-}
-
-func count(thing string, c chan string) {
-	for i := 1; i <= 5; i++ {
-		c <- thing // 3: send value through channel created in line 9 (remember that sending through channel is a blocking operation)
-		time.Sleep(time.Millisecond * 500)
-	}
-
-	close(c)
+	msg := <-c // 2: since the previous operation (send block) is blocking this operation (receive block), msg is unable to receive resulting in a deadlock.
+	fmt.Println(msg)
 }
