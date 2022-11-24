@@ -2,25 +2,33 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"time"
 )
 
-// Resolving the blocking operation constraint of channel
-// - One solution is to receive in separate go routine
-// - Another solution is to create a buffered channel by specifying capacity (in this case, 2)
 func main() {
-	start := time.Now()
-	c := make(chan string, 2) // This allows you to fill-up a buffered channel without a corresponding receiver, and it won't block until the channel is full.
-	c <- "hello"
-	c <- "world"
-	// c <- "three" // If you attempt to send a third value, it'll result in a deadlock since the channel buffer is set to 2 and already full.
-	msg := <-c
-	fmt.Println(msg)
+	c1 := make(chan string)
+	c2 := make(chan string)
 
-	msg = <-c
-	fmt.Println(msg)
+	go func() {
+		for {
+			c1 <- "Every 500ms"
+			time.Sleep(time.Millisecond * 500)
+		}
+	}()
 
-	elapsed := time.Since(start)
-	log.Printf("Execution took %s", elapsed)
+	go func() {
+		for {
+			c2 <- "Every 2 seconds"
+			time.Sleep(time.Second * 2)
+		}
+	}()
+
+	for {
+		select { // Without the select construct, msg1 must wait for msg2 to receive, meaning msg1 also prints every 2 seconds.
+		case msg1 := <-c1:
+			fmt.Println(msg1)
+		case msg2 := <-c2:
+			fmt.Println(msg2)
+		}
+	}
 }
