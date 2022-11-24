@@ -9,8 +9,13 @@ func main() {
 	c := make(chan string)
 	go count("sheep", c)
 
-	msg := <-c // receiving end waiting for value stored in c (value is then assigned to variable msg)
-	fmt.Println(msg)
+	for {
+		msg, open := <-c
+		if !open {
+			break
+		}
+		fmt.Println(msg)
+	}
 }
 
 func count(thing string, c chan string) {
@@ -18,4 +23,6 @@ func count(thing string, c chan string) {
 		c <- thing
 		time.Sleep(time.Millisecond * 500)
 	}
+
+	close(c)
 }
