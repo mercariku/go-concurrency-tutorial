@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	count("sheep")
+	go count("sheep")
 	count("fish")
 }
 func count(thing string) {
