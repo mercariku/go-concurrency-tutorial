@@ -1,12 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"time"
+)
 
-// Demonstrating a constraint of channel - Blocking operation
+// Resolving the blocking operation constraint of channel
+// - One solution is to receive in separate go routine
+// - Another solution is to create a buffered channel by specifying capacity (in this case, 2)
 func main() {
-	c := make(chan string)
-	c <- "hello" // 1: Here, we send a value through the channel, c, which blocks the next operation.
-
-	msg := <-c // 2: since the previous operation (send block) is blocking this operation (receive block), msg is unable to receive resulting in a deadlock.
+	start := time.Now()
+	c := make(chan string, 2) // This allows you to fill-up a buffered channel without a corresponding receiver, and it won't block until the channel is full.
+	c <- "hello"
+	c <- "world"
+	// c <- "three" // If you attempt to send a third value, it'll result in a deadlock since the channel buffer is set to 2 and already full.
+	msg := <-c
 	fmt.Println(msg)
+
+	msg = <-c
+	fmt.Println(msg)
+
+	elapsed := time.Since(start)
+	log.Printf("Execution took %s", elapsed)
 }
