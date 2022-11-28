@@ -102,4 +102,41 @@ func TurnoutWithQuitChannel(Quit <-chan int, InA, InB, OutA, OutB chan int) {
 //4//
 - 90% of use cases can be covered with CSP and select
 
+//5// Where channels fail
+- You can create deadlocks with channels
+- Channels pass around copies, which can affect performance
+- Passing pointers to channels can create race conditions
+- What about "naturally shared" structures like caches or registries? (DON'T do this!!)
+
+//5.1// Mutexes
+- One potential solution to problems caused by channel is 'Mutexes'
+- But...
+- Mutexes are like toilets
+- The longer you occupy them, the longer the queue gets
+- Read/Write mutexes can only reduce the problem
+- Using multiple mutexes will cause deadlocks sooner or later
+- All-in-all, not the solution we are looking for
+
+//5.2// Three Shades of Code
+- Blocking = Your program may get locked up (for undefined time)
+- Lock free = At least one part of your program is always making progress
+- Wait free = All parts of your program are always making progress
+- How to write lock free or wait free code?
+
+//5.3// Atomic operations
+- sync.atomic package
+- Store, Load, Add, Swap and CompareAndSwap
+- Mapped to thread-safe CPU instructions
+- These instructions only work on integer types
+- Only about 10-60x slower than their non-atomi counter-parts
+
+//5.4// Spinning CAS
+- You need a 'state' variable and a 'free' constant
+- Use CAS (CompareAndSwap) in a loop:
+-- If state is not free, try again until it is
+-- If state is free, set it to something else
+- If you managed to change the state, you 'own' it
+
+
+
 */
