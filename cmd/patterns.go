@@ -187,4 +187,12 @@ func (ts *TicketStore) GetDone() []string{
 -- You may switch windows at any instruction
 -- Watch your variables for race conditions
 
+//8// Guidelines for non-blocking code
+- Don't switch between atomic and non-atomic functions
+- Target and exploit situations which enforce uniqueness
+- Avoid changing two things at a time
+-- Sometimes you can exploit bit operations
+-- Sometimes intelligent ordering can do the trick
+-- Sometimes it's just not possible at all
+
 */
