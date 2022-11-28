@@ -179,4 +179,12 @@ func (ts *TicketStore) GetDone() []string{
 - Treat the ticket as an index to store your data
 - Increase done to extend the 'ready to read' range
 
+//7// Debugging non-blocking code
+- "Instruction pointer gamer"
+- Rules:
+-- Pull up two windows (= two go routines) with the same code
+-- You have one instruction pointer that iterates through your code
+-- You may switch windows at any instruction
+-- Watch your variables for race conditions
+
 */
