@@ -154,4 +154,11 @@ func(1 *Spinlock) Unlock(){
 -- If state is free, set it to something else
 - If you managed to change the state, you 'own' it
 
+//6// Ticket storage
+- We need an indexed data structure, a 'ticket' and a 'done' variable
+- A fucntion draws a new ticket by adding 1 to the ticket
+- Every ticket number is unique as we never decrement
+- Treat the ticket as an index to store your data
+- Increase done to extend the 'ready to read' range
+
 */
