@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"runtime"
+	"sync/atomic"
 	"time"
 )
 
@@ -81,6 +83,21 @@ func TurnoutWithQuitChannel(Quit <-chan int, InA, InB, OutA, OutB chan int) {
 	}
 }
 
+type Spinlock struct{
+	state *int32
+}
+
+const free = int32(0)
+
+func(1 *Spinlock) Lock(){
+	for !atomic.CompareAndSwapInt32(1.state, free, 42) {// 42 or any other value but 0
+		runtime.Gosched()  // Poke the scheduler
+	}
+}
+
+func(1 *Spinlock) Unlock(){
+	atomic.StoreInt32(1.state, free) // Once atomic, always atomic!
+}
 /*
 
 //1//
@@ -136,7 +153,5 @@ func TurnoutWithQuitChannel(Quit <-chan int, InA, InB, OutA, OutB chan int) {
 -- If state is not free, try again until it is
 -- If state is free, set it to something else
 - If you managed to change the state, you 'own' it
-
-
 
 */
