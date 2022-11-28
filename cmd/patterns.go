@@ -98,6 +98,24 @@ func(1 *Spinlock) Lock(){
 func(1 *Spinlock) Unlock(){
 	atomic.StoreInt32(1.state, free) // Once atomic, always atomic!
 }
+
+type TicketStore struct{
+	ticket *uint64
+	done *uint64
+	slots []string // for simplicity: imagine this to be infinite
+}
+
+func (ts *TicketStore) Put(s string){
+	t := atomic.AddUint64(ts.ticket, 1) -1 // draw a ticket
+	slots[t] = s // store your data
+	for !atomi.CompareAndSwapUint64(ts.done, t, t+1){ // increase done // This part of the code enables wait-free
+		runtime.Gosched()
+	}
+}
+
+func (ts *TicketStore) GetDone() []string{
+	return ts.slots[:atomic.LoadUint64(ts.done)+1] // read up to done
+}
 /*
 
 //1//
