@@ -6,33 +6,45 @@ import (
 	"time"
 )
 
-func someFunc(num string) {
-	fmt.Println(num)
+func sliceToChannel(nums []int) <-chan int { // the "<-chan int" just means "it returns a read-only channel"
+	out := make(chan int) // notice it's an unbuffered channel
+	go func() {
+		for _, n := range nums {
+			out <- n
+		}
+		close(out)
+	}()
+
+	return out
 }
 
-func doWork(done <-chan bool) { // this is how you declare read only channel
-	for {
-		select {
-		case <-done:
-			return
-		default:
-			fmt.Println("Doing work")
+func sq(in <-chan int) <-chan int {
+	out := make(chan int)
+	go func() {
+		for n := range in {
+			out <- n * n
 		}
-	}
+		close(out)
+	}()
+	return out
 }
 
 func main() {
 	start := time.Now()
 
-	// Done channel pattern
-	// for select pattern is common because of the done channel
-	done := make(chan bool)
-	go doWork(done)
+	// Pipeline
 
-	time.Sleep(time.Second * 3)
+	nums := []int{2, 3, 4, 7, 1} // input
 
-	close(done)
+	// stage 1
+	dataChannel := sliceToChannel(nums) // here, we put each element of 'nums' onto a channel (i.e. dataChannel)
+	// stage 2
+	finalChannel := sq(dataChannel)
 
+	// Final stage
+	for n := range finalChannel {
+		fmt.Println(n)
+	}
 	elapsed := time.Since(start)
 	log.Printf("%s", elapsed)
 
