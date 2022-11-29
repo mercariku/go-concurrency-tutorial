@@ -10,23 +10,28 @@ func someFunc(num string) {
 	fmt.Println(num)
 }
 
+func doWork(done <-chan bool) { // this is how you declare read only channel
+	for {
+		select {
+		case <-done:
+			return
+		default:
+			fmt.Println("Doing work")
+		}
+	}
+}
+
 func main() {
 	start := time.Now()
 
-	charChannel := make(chan string, 3)
-	chars := []string{"a", "b", "c"}
+	// Done channel pattern
+	// for select pattern is common because of the done channel
+	done := make(chan bool)
+	go doWork(done)
 
-	for _, s := range chars {
-		select {
-		case charChannel <- s:
-		}
-	}
+	time.Sleep(time.Second * 3)
 
-	close(charChannel)
-
-	for result := range charChannel {
-		fmt.Println(result)
-	}
+	close(done)
 
 	elapsed := time.Since(start)
 	log.Printf("%s", elapsed)
