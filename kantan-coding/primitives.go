@@ -29,6 +29,9 @@ func sq(in <-chan int) <-chan int {
 	return out
 }
 
+var pl = fmt.Println
+var lp = log.Printf
+
 func main() {
 	start := time.Now()
 
@@ -43,9 +46,9 @@ func main() {
 
 	// Final stage
 	for n := range finalChannel {
-		fmt.Println(n)
+		pl(n)
 	}
 	elapsed := time.Since(start)
-	log.Printf("%s", elapsed)
+	lp("%s", elapsed)
 
 }
